@@ -12,27 +12,30 @@ variables:
   BuildConfiguration: 'Release'
   DockerImageName: 'cicd-poc-267021/musicstore'
 steps:
+  - 
   - task: UseDotNet@2
     inputs:
       version: '3.1.x'
+      
   - task: DotNetCoreCLI@2
     displayName: Restore
     inputs:
       command: restore
       projects: '$(RestoreBuildProjects)'
-      feedsToUse: config
-      nugetConfigPath: NuGet.config
+      
   - task: DotNetCoreCLI@2
     displayName: Build
     inputs:
       projects: '$(RestoreBuildProjects)'
       arguments: '--configuration $(BuildConfiguration) --framework=$(TargetFramework)'
+      
   - task: DotNetCoreCLI@2
     displayName: Test
     inputs:
       command: test
       projects: '$(TestProjects)'
       arguments: '--configuration $(BuildConfiguration) --framework=$(TargetFramework)'
+      
   - task: DotNetCoreCLI@2
     displayName: Publish
     inputs:
@@ -40,21 +43,25 @@ steps:
       publishWebProjects: True
       arguments: '--configuration $(BuildConfiguration) --framework=$(TargetFramework) -o publish'
       zipAfterPublish: false
+      
   - task: CmdLine@1
     displayName: 'Lock image version in deployment.yaml'
     inputs:
       filename: /bin/bash
       arguments: '-c "awk ''{gsub(\"MUSICSTORE_IMAGE\", \"gcr.io/$(DockerImageName):$(Build.BuildId)\", $0); print}'' deployment.yaml > $(build.artifactstagingdirectory)/deployment.yaml"'
+      
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Artifact'
     inputs:
       PathtoPublish: '$(build.artifactstagingdirectory)'
+      
   - task: Docker@0
     displayName: 'Build image'
     inputs:
       containerregistrytype: 'Container Registry'
       dockerRegistryConnection: 'gcr-tutorial'
       imageName: '$(DockerImageName):$(Build.BuildId)'
+      
   - task: Docker@0
     displayName: 'Publish image'
     inputs:
