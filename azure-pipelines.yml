@@ -12,7 +12,7 @@ variables:
   BuildConfiguration: 'Release'
   DockerImageName: 'cicd-poc-267021/musicstore'
 steps:
-  - 
+  
   - task: UseDotNet@2
     inputs:
       version: '3.1.x'
