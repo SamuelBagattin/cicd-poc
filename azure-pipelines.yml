@@ -4,14 +4,17 @@ resources:
 queue:
   name: Hosted Ubuntu 1604
 trigger:
-  - testing
+  - master
 variables:
-  TargetFramework: 'netcoreapp2.0'
-  RestoreBuildProjects: 'samples/**/*.csproj'
-  TestProjects: 'test/MusicStore.Test/*.csproj'
+  TargetFramework: 'netcoreapp3.1'
+  RestoreBuildProjects: '**/*.csproj'
+  TestProjects: 'Tests/*.csproj'
   BuildConfiguration: 'Release'
   DockerImageName: 'cicd-poc-267021/musicstore'
 steps:
+  - task: UseDotNet@2
+    inputs:
+      version: '3.1.x'
   - task: DotNetCoreCLI@2
     displayName: Restore
     inputs:
@@ -35,9 +38,8 @@ steps:
     inputs:
       command: publish
       publishWebProjects: True
-      arguments: '--configuration $(BuildConfiguration) --framework=$(TargetFramework)'
+      arguments: '--configuration $(BuildConfiguration) --framework=$(TargetFramework) -o publish'
       zipAfterPublish: false
-      modifyOutputPath: false
   - task: CmdLine@1
     displayName: 'Lock image version in deployment.yaml'
     inputs:
