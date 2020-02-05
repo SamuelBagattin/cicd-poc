@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace MusicStore.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("")]
     public class HealthController : ControllerBase
     {
 
